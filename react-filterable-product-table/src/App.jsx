@@ -1,97 +1,100 @@
-[
-    { category: "Fruits", price: "$1", stocked: true, name: "Apple" },
-    { category: "Fruits", price: "$1", stocked: true, name: "Dragonfruit" },
-    { category: "Fruits", price: "$2", stocked: true, name: "Passionfruit" },
-    { category: "Vegetables", price: "$2", stocked: true, name: "Spinach" },
-    { category: "Vegetables", price: "$4", stocked: true, name: "Pumpkin" },
-    { category: "Vegetables", price: "$1", stocked: true, name: "Peas" }
-]
 
+function ProductRow({ product }) {
+    const name = product.stocked ? product.name :
+        <span style={{color: 'red'}}>
+            {product.name}
+        </span>;
 
-function ProductRow(name, price) {
     return (
-        <>
-            <h3>ProductRow</h3>
-        </>
+        <tr>
+            <td>{name}</td>
+            <td>{product.price}</td>
+        </tr>
     );
 }
 
 function ProductCategoryRow( { category }) {
     return (
-        <>
-            <h3>ProductCategoryRow</h3>
-            {category}
-        </>
+        <tr>
+            <th colSpan="2">
+                {category}
+            </th>
+        </tr>
     );
 }
-
-function ProductTable() {
-    return (
-        <div>
-            <h2>Product Table</h2>
-            {/* Product table will be rendered here */}
-        </div>
-    );
-}
-
-// function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockOnlyChange }) {
-//     return (
-//         <>
-//             <h2>SearchBar</h2>
-//         </>
-//     );
-    // return (
-    //     <form>
-    //         <input
-    //             type="text"
-    //             placeholder="Search..."
-    //             value={filterText}
-    //             onChange={(e) => onFilterTextChange(e.target.value)}
-    //         />
-    //         <p>
-    //             <input
-    //                 type="checkbox"
-    //                 checked={inStockOnly}
-    //                 onChange={(e) => onInStockOnlyChange(e.target.checked)}
-    //             />
-    //             {' '}
-    //             Only show products in stock
-    //         </p>
-    //     </form>
-    // );
-// }
 
 function SearchBar() {
     return(
-        <>
-            <h2>SearchBar</h2>
-        </>
+        <form>
+            <input type="text" placeholder="Search..." />
+            <label>
+                <input type="checkbox" />
+                {' '} Only show products in stock
+            </label>
+        </form>
     );
 }
 
-function FilterableProductTable({ products }) {
+function ProductTable({ products }) {
+    const rows = [];
+    let lastCategory = null;
+
+    products.forEach((product) => {
+        if (product.category !== lastCategory) {
+            rows.push(
+                <ProductCategoryRow
+                    category={product.category}
+                    key={product.category}
+                />
+            );
+        }
+        rows.push(
+            <ProductRow
+                product={product}
+                key={product.name}
+            />
+        );
+        lastCategory = product.category;
+    });
+
     return (
-        <div>
-            <h2>Filterable Product Table</h2>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>{rows}</tbody>
+        </table>
+    );
+}
+
+function FilterableProductTable( { products } ) {
+    return (
+        <>
+            <SearchBar />
+            <ProductTable products={products} />
+        </>
     );
 }
 
 function App() {
+
+    const products = [
+        { category: "Fruits", price: "$1", stocked: true, name: "Apple" },
+        { category: "Fruits", price: "$1", stocked: true, name: "Dragonfruit" },
+        { category: "Fruits", price: "$2", stocked: false, name: "Passionfruit" },
+        { category: "Vegetables", price: "$2", stocked: true, name: "Spinach" },
+        { category: "Vegetables", price: "$4", stocked: false, name: "Pumpkin" },
+        { category: "Vegetables", price: "$1", stocked: true, name: "Peas" }
+    ]
+
     return (
         <>
             <h1>Filterable Product Table</h1>
             <div className="App">
-                <FilterableProductTable/>
-                <SearchBar />
-                <ProductCategoryRow category="fruits"/>
-                <ProductRow />
-                <ProductRow />
-                <ProductRow />
-                <ProductCategoryRow category="vegetables"/>
-                <ProductRow />
-                <ProductRow />
-                <ProductRow />
+                <FilterableProductTable products={products}/>
             </div>
         </>
     );
